@@ -1,5 +1,6 @@
 import express from "express";
-import { router as userRouter } from "./routes/users";
+import { router as userRouter } from "./routes/users.js";
+import { router as cardRouter } from "./routes/cards.js";
 
 const app = express();
 const port = 3000;
@@ -17,6 +18,12 @@ app.use(logger);
 
 app.use("/users", userRouter);
 
+app.use("/cards", cardRouter);
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
+});
+
+app.use((req, res) => {
+  res.status(404).json({ message: "A solicitação não foi encontrada" });
 });
