@@ -2,8 +2,35 @@ import express from "express";
 import { router as userRouter } from "./routes/users.js";
 import { router as cardRouter } from "./routes/cards.js";
 
+import mongoose, { connect } from "mongoose";
+
+async function connectDatabase() {
+  try {
+    await mongoose.connect("mongodb://localhost:27017/aroundb", {
+      serverSelectionTimeoutMS: 10000,
+    });
+    console.log("Database connect");
+  } catch (error) {
+    console.log("Error: Não foi possível conectar ao database");
+  }
+}
+
 const app = express();
+app.use(express.json());
+
+// Middleware de Autorização
+
+app.use((req, res, next) => {
+  req.user = {
+    _id: "67d384943e818db3576451b0",
+  };
+
+  next();
+});
+
 const port = 3000;
+
+connectDatabase();
 
 function logger(req, res, next) {
   console.log(

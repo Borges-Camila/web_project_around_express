@@ -1,44 +1,103 @@
+// minuto 31:40 do webnário
+
 import { Router } from "express";
-import fs from "node:fs";
-import path from "node:path";
+import {
+  listUsers,
+  getUserById,
+  createUser,
+  updateUserInfo,
+  updateUserAvatar,
+} from "../controllers/users.js";
 
 const router = Router();
-const __dirname = import.meta.dirname;
-const file = path.join(__dirname, "..", "data", "users.json");
-let users = [];
 
-fs.readFile(file, (error, data) => {
-  if (error) {
-    users = { error: "Houve um erro ao fazer a leitura dos usuários" };
+// procura os usuários
 
-    return;
+router.get("/", async (request, response) => {
+  try {
+    const users = await listUsers();
+    return response.json(users);
+  } catch (error) {
+    console.log(error);
+    return response.status(404).json({
+      error: "ERROR: Não foi possivel encontrar os usuários",
+    });
   }
-  users = JSON.parse(data);
 });
 
-router.get("/", (request, response) => {
-  if (users.error) {
-    return response.status(404).json(users);
-  }
+// procura usuário pelo id
 
-  return response.json(users);
+router.get("/:_id", async (request, response) => {
+  try {
+    const { _id } = request.params;
+    const foundUser = await getUserById(_id);
+
+    if (!foundUser) {
+      return response
+        .status(404)
+        .json({ message: `${_id} do usuário não encontrado` });
+    }
+
+    return response.json(foundUser);
+  } catch (error) {
+    console.log(error);
+    return response.status(404).json({
+      error: "ERROR: Não foi possivel encontrar o usuário especificado",
+    });
+  }
 });
 
-router.get("/:_id", (request, response) => {
-  if (users.error) {
-    return response.status(404).json(users);
+// criação de novo usuário
+
+router.post("/", async (request, response) => {
+  try {
+    const body = request.body;
+    const createdUser = await createUser(body);
+    return response.status(201).json(createdUser);
+  } catch (error) {
+    console.log(error);
+    return response.status(400).json({
+      error: "ERROR: Não foi possivel criar novo usuário",
+    });
   }
+});
 
-  const { _id } = request.params;
-  const foundUser = users.find((user) => user._id == _id);
+// atualização de usuário (name, about)
 
-  if (!foundUser) {
-    return response
-      .status(404)
-      .json({ message: `${_id} do usuário não encontrado` });
+router.patch("/me", async (request, response) => {
+  try {
+    const { _id, name, about } = request.body;
+    if (!_id) {
+      return response
+        .status(400)
+        .json({ error: "ID do usuário não fornecido" });
+    }
+    const updatedUserInfo = await updateUserInfo(_id, { name, about });
+    return response.status(200).json(updatedUserInfo);
+  } catch (error) {
+    return response.status(400).json({
+      error: "ERROR: Não foi possivel atualizar o usuário",
+    });
   }
+});
 
-  return response.json(foundUser);
+// atualização de usuário (avatar)
+
+router.patch("/me/avatar", async (request, response) => {
+  try {
+    const { _id, avatar } = request.body;
+    if (!_id) {
+      return response
+        .status(400)
+        .json({ error: "ID do usuário não fornecido" });
+    }
+    const updatedUserAvatar = await updateUserAvatar(_id, { avatar });
+    return response.status(200).json(updatedUserAvatar);
+  } catch (error) {
+    return response.status(400).json({
+      error: "ERROR: Não foi possivel atualizar o usuário",
+    });
+  }
 });
 
 export { router };
