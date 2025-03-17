@@ -1,4 +1,4 @@
-import { CardModel } from "../models/card.js";
+import CardModel from '../models/card.js';
 
 // busca os cartões
 async function listCards() {
@@ -6,9 +6,9 @@ async function listCards() {
     const cards = await CardModel.find();
     return cards;
   } catch (error) {
-    throw new Error("Não foi possivel encontrar os cartºoes").mongoError(
-      "Mongo - get cards"
-    );
+    throw new Error(
+      'Não foi possivel encontrar os cartºoes',
+    ).mongoError('Mongo - get cards');
   }
 }
 
@@ -18,7 +18,7 @@ async function createCard(items, userId) {
     const { name, link } = items;
 
     if (!name || !link) {
-      throw new Error("Nome e link são obrigatórios");
+      throw new Error('Nome e link são obrigatórios');
     }
 
     const newCard = new CardModel({ name, link, owner: userId });
@@ -26,7 +26,7 @@ async function createCard(items, userId) {
 
     return createdCard;
   } catch (error) {
-    throw new Error("Não foi possível criar o cartão");
+    throw new Error('Não foi possível criar o cartão');
   }
 }
 
@@ -34,23 +34,25 @@ async function createCard(items, userId) {
 async function deleteCard(cardId, userId) {
   try {
     const card = await CardModel.findById(cardId).orFail(() => {
-      const error = new Error("Cartão não encontrado");
+      const error = new Error('Cartão não encontrado');
       error.statusCode = 404;
       throw error;
     });
 
     if (card.owner.toString() !== userId) {
-      throw new Error("Você não tem permissão para deletar este cartão");
+      throw new Error(
+        'Você não tem permissão para deletar este cartão',
+      );
     }
 
     await CardModel.findByIdAndDelete(cardId);
-    return { message: "Cartão foi deletado com sucesso" };
+    return { message: 'Cartão foi deletado com sucesso' };
   } catch (error) {
-    console.error("Erro ao deletar cartão:", error);
+    console.error('Erro ao deletar cartão:', error);
     throw new Error(
       error.statusCode === 404
-        ? "Cartão não encontrado"
-        : "Não foi possível deletar o cartão"
+        ? 'Cartão não encontrado'
+        : 'Não foi possível deletar o cartão',
     );
   }
 }
@@ -61,20 +63,20 @@ async function likeCard(cardId, userId) {
     const card = await CardModel.findByIdAndUpdate(
       cardId,
       { $addToSet: { likes: userId } },
-      { new: true }
+      { new: true },
     ).orFail(() => {
-      const error = new Error("Cartão não encontrado");
+      const error = new Error('Cartão não encontrado');
       error.statusCode = 404;
       throw error;
     });
 
     return card;
   } catch (error) {
-    console.error("Erro ao curtir cartão:", error);
+    console.error('Erro ao curtir cartão:', error);
     throw new Error(
       error.statusCode === 404
-        ? "Cartão não encontrado"
-        : "Não foi possível curtir o cartão"
+        ? 'Cartão não encontrado'
+        : 'Não foi possível curtir o cartão',
     );
   }
 }
@@ -85,22 +87,28 @@ async function dislikeCard(cardId, userId) {
     const card = await CardModel.findByIdAndUpdate(
       cardId,
       { $pull: { likes: userId } },
-      { new: true }
+      { new: true },
     ).orFail(() => {
-      const error = new Error("Cartão não encontrado");
+      const error = new Error('Cartão não encontrado');
       error.statusCode = 404;
       throw error;
     });
 
     return card;
   } catch (error) {
-    console.error("Erro ao descurtir cartão:", error);
+    console.error('Erro ao descurtir cartão:', error);
     throw new Error(
       error.statusCode === 404
-        ? "Cartão não encontrado"
-        : "Não foi possível descurtir o cartão"
+        ? 'Cartão não encontrado'
+        : 'Não foi possível descurtir o cartão',
     );
   }
 }
 
-export { listCards, createCard, deleteCard, likeCard, dislikeCard };
+export {
+  listCards,
+  createCard,
+  deleteCard,
+  likeCard,
+  dislikeCard,
+};

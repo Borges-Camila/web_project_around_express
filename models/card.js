@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema } from 'mongoose';
 
 const linkRegex = /^https?:\/\//;
 
@@ -14,28 +14,27 @@ const cardSchema = new mongoose.Schema(
       type: String,
       required: true,
       validate: {
-        validator: function (validity) {
-          console.log("Validando a URL:", validity);
+        validator(validity) {
           return linkRegex.test(validity);
         },
-        message: (props) => `"${props.value}" é um link inválido`,
+        message: (props) => `'${props.value}' é um link inválido`,
       },
     },
     owner: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: "User",
+      ref: 'User',
     },
     likes: {
       type: [Schema.Types.ObjectId],
-      ref: "User",
+      ref: 'User',
       default: [],
     },
   },
   {
     versionKey: false,
-  }
+  },
 );
 
-const CardModel = mongoose.model("cards", cardSchema);
-export { CardModel };
+const CardModel = mongoose.model('cards', cardSchema);
+export default CardModel;

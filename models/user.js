@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const linkRegex = /^https?:\/\//;
 
@@ -20,18 +20,17 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       validate: {
-        validator: function (validity) {
-          console.log("Validando a URL:", validity);
+        validator(validity) {
           return linkRegex.test(validity);
         },
-        message: (props) => `"${props.value}" é um link inválido`,
+        message: (props) => `'${props.value}' é um link inválido`,
       },
     },
   },
   {
     versionKey: false,
-  }
+  },
 );
 
-const UserModel = mongoose.model("users", userSchema);
-export { UserModel };
+const UserModel = mongoose.model('users', userSchema);
+export default UserModel;
